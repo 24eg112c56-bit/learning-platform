@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Digital Learning Platform 🎓
 
 A full-stack EdTech platform inspired by Byju's, Unacademy, and Khan Academy with real-time features.
@@ -305,3 +306,7 @@ Contributions are welcome! Feel free to submit issues and pull requests.
 ---
 
 Built with ❤️ for education
+=======
+# learning-platform
+A digital learning platform that provides interactive courses, video lessons, and quizzes to help students learn new skills anytime and anywhere.
+>>>>>>> 83f1fc6ddc2224da574f0edc75fc6a8bc2711649
