@@ -1,0 +1,10 @@
+{
+  "name": "digital-learning-platform",
+  "version": "1.0.0",
+  "description": "Full-stack EdTech platform",
+  "scripts": {
+    "server": "cd server && node server.js",
+    "client": "cd client && npm start",
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install"
+  }
+}
