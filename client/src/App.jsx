@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import StudentDashboard from './pages/StudentDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import ParentDashboard from './pages/ParentDashboard';
+import ApiTest from './pages/ApiTest';
 
 const ProtectedRoute = ({ children, role }) => {
   const { user, loading } = useAuth();
@@ -32,6 +33,7 @@ function App() {
           <Route path="/student/dashboard" element={<ProtectedRoute role="student"><StudentDashboard /></ProtectedRoute>} />
           <Route path="/teacher/dashboard" element={<ProtectedRoute role="teacher"><TeacherDashboard /></ProtectedRoute>} />
           <Route path="/parent/dashboard" element={<ProtectedRoute role="parent"><ParentDashboard /></ProtectedRoute>} />
+          <Route path="/api-test" element={<ApiTest />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
