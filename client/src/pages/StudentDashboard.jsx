@@ -3,7 +3,7 @@ import axios from 'axios';
 import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 
-const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+import API from '../config/api';
 
 const StatCard = ({ label, value, sub, color }) => (
   <div className="card">

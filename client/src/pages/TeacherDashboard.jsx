@@ -3,7 +3,7 @@ import axios from 'axios';
 import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 
-const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+import API from '../config/api';
 
 const Modal = ({ title, onClose, children }) => (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">

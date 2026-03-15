@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
+import API_URL from '../config/api';
 
 let socket;
 
@@ -11,7 +12,7 @@ const Notifications = () => {
 
   useEffect(() => {
     if (!user) return;
-    socket = io(process.env.REACT_APP_API_URL || 'http://localhost:5000');
+    socket = io(API_URL);
     socket.emit('join-room', user.id);
 
     const add = (title, message, type = 'info') => {
