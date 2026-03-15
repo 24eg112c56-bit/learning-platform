@@ -14,51 +14,67 @@ const courseRoutes = require('./routes/courses');
 const app = express();
 const server = http.createServer(app);
 
-// Allow all origins (fixes CORS on Render/Vercel)
-app.use(cors({ origin: '*', methods: ['GET','POST','PUT','DELETE','OPTIONS'], allowedHeaders: ['Content-Type','Authorization'] }));
+// CORS — allow localhost + deployed frontend
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.options('*', cors());
 app.use(express.json());
 
+// Socket.IO
 const io = socketIo(server, {
   cors: { origin: '*', methods: ['GET', 'POST'] }
 });
-
-// MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB error:', err));
-
-// Socket.io
 io.on('connection', (socket) => {
   socket.on('join-room', (userId) => socket.join(userId));
 });
 app.set('io', io);
 
-// Root health check — fixes "Cannot GET /"
+// MongoDB with retry
+const connectDB = async () => {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    console.error('❌ MONGODB_URI is not set in environment variables!');
+    console.error('Go to Render → Environment → add MONGODB_URI');
+    return;
+  }
+  try {
+    await mongoose.connect(uri);
+    console.log('✅ MongoDB connected successfully');
+  } catch (err) {
+    console.error('❌ MongoDB connection failed:', err.message);
+    console.log('Retrying in 5 seconds...');
+    setTimeout(connectDB, 5000);
+  }
+};
+connectDB();
+
+// Health check
 app.get('/', (req, res) => {
-  res.json({ status: 'ok', message: 'LearnHub API is running 🚀', version: '1.0.0' });
+  res.json({ status: 'ok', message: 'LearnHub API is running 🚀' });
 });
 
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
+// Diagnostic — shows what env vars Render has loaded
+app.get('/debug', (req, res) => {
+  res.json({
+    mongoUri: process.env.MONGODB_URI ? 'SET ✅' : 'MISSING ❌',
+    mongoUriPreview: process.env.MONGODB_URI ? process.env.MONGODB_URI.substring(0, 30) + '...' : 'NOT SET',
+    jwtSecret: process.env.JWT_SECRET ? 'SET ✅' : 'MISSING ❌',
+    nodeEnv: process.env.NODE_ENV || 'not set',
+    port: process.env.PORT || '5000',
+    mongoState: mongoose.connection.readyState === 1 ? 'Connected ✅' : 'Disconnected ❌'
+  });
+});
 
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/teacher', teacherRoutes);
 app.use('/api/parent', parentRoutes);
 app.use('/api/courses', courseRoutes);
 
-// 404 handler
-app.use((req, res) => res.status(404).json({ message: `Route ${req.method} ${req.url} not found` }));
-
-// Error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Internal server error', error: err.message });
-});
-
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-app.get("/", (req, res) => {
-  res.send("Learning Platform Backend is running");
-});
